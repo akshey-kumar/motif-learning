@@ -63,6 +63,7 @@ class _MotifVisualitsation:
         else:
             for motif in self.motif_list:
                 plot_single_motif(motif)
+        plt.show()
 
 class MotifLearner(_MotifVisualitsation):
     """
