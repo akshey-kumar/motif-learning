@@ -13,6 +13,22 @@ class _MotifVisualitsation:
 
     """
     Base class for plotting functions
+        Attributes
+    ----------
+        sim_thresh
+        sim_matrix
+        l_motif_range
+        iterator
+        dataset
+        frequent
+        motif_list
+        motif_comp
+        pruned_motif_list
+
+    Methods
+    -------
+        matrix_plot
+        plot_motif_appearances
     """
     def matrix_plot(self):
         """
@@ -33,8 +49,7 @@ class _MotifVisualitsation:
             plt.show()
             return sim_mtx
 
-        interactive_plot = interactive(mplot, l_motif=(1, 40))
-        output = interactive_plot.children[-1]
+        interactive_plot = interactive(mplot, l_motif=tuple(self.l_motif_range))
         return interactive_plot
 
     def plot_motif_appearances(self, pruned=True):
@@ -64,6 +79,9 @@ class _MotifVisualitsation:
             for motif in self.motif_list:
                 plot_single_motif(motif)
         plt.show()
+
+
+
 
 class MotifLearner(_MotifVisualitsation):
     """
@@ -104,7 +122,7 @@ class MotifLearner(_MotifVisualitsation):
         self.sim_thresh = sim_thresh
         self.freq_thresh = freq_thresh
         self.l_motif_range = l_motif_range
-        self.iterator = range(self.l_motif_range[0], self.l_motif_range[1])
+        self.iterator = range(*self.l_motif_range)
         self.dataset = None
         self.frequent = None
         self.motif_list = None
@@ -311,3 +329,37 @@ class MotifLearner(_MotifVisualitsation):
         return self.pruned_motif_list
 
 
+
+def motif_composition(self):
+    """ Creates a matrix that tells whether the j-th motif is a submotif of i-th motif
+    This tells about the compositional structure of the motifs
+    """
+    motif_comp_mtx = np.zeros((len(self.motif_list),len(self.motif_list)))
+    for i, big_motif in reversed(list(enumerate(self.motif_list))):
+        for j in range(i):
+            small_motif = self.motif_list[j]
+            if self._is_submotif(big_motif,small_motif):
+                motif_comp_mtx[i,j]=1
+    self.motif_comp_mtx = motif_comp_mtx
+    return self.motif_comp_mtx
+
+# Matrix for Hasse diagram 
+### Obtained by removing edges that are there for transitivity
+### That is, wherever there are three nodes x, y,and z with
+### edges from x to y and from y to z, remove the edge between
+### x and z.
+
+mfc = self.motif_composition(ml)
+mtx = sparse.csr_matrix(mfc)
+new_mtx = mtx.copy()
+for i,j in zip(*mtx.nonzero()):
+    for k,l in zip(*mtx.nonzero()):
+        if j==k:
+            new_mtx[i,l]=0
+            
+print(mtx.toarray())
+print(new_mtx.toarray())
+### Pruned motifs
+prune_idx = list(set(np.arange(len(motifl.motif_list)))- set(new_mtx.nonzero()[1]))
+pruned_motif_list = [motifl.motif_list[i] for i in prune_idx]
+print(pruned_motif_list)
