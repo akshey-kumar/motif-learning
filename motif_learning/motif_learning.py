@@ -259,22 +259,6 @@ class MotifLearner(_MotifVisualisation):
                         plt.title(f'{l_motif}-motifs')
         return self.motif_list
 
-    def _is_submotif(self, big_motif,small_motif):
-        """ Checks whether a smaller motif is a submotif of a bigger motif
-
-        Parameters
-        ----------
-        big_motif : {list} containing the bigger motif
-        small_motif: {list} containing the smaller motif
-        Returns
-        -------
-        is_submotif: {bool}
-        """
-        for i, _ in enumerate(big_motif):
-            if np.array_equal(big_motif[i:i+len(small_motif)],small_motif):
-                return True
-        return False
-
     def fit(self, dataset):
         """ Fit method
         Parameters
@@ -290,6 +274,22 @@ class MotifLearner(_MotifVisualisation):
         self.frequent = self.frequent_motifs()
         self.motif_list = self.get_motifs()
         return self
+    
+    def _is_submotif(self, big_motif,small_motif):
+        """ Checks whether a smaller motif is a submotif of a bigger motif
+
+        Parameters
+        ----------
+        big_motif : {list} containing the bigger motif
+        small_motif: {list} containing the smaller motif
+        Returns
+        -------
+        is_submotif: {bool}
+        """
+        for i, _ in enumerate(big_motif):
+            if np.array_equal(big_motif[i:i+len(small_motif)],small_motif):
+                return True
+        return False
 
     def motif_composition(self, as_array=True):
         """ Creates a matrix that tells whether the j-th motif is a submotif of i-th motif
@@ -307,6 +307,7 @@ class MotifLearner(_MotifVisualisation):
                 small_motif = self.motif_list[j]
                 if self._is_submotif(big_motif,small_motif):
                     submotif_matrix[i,j]=1
+
         ### Hasse pruning of submotif_matrix
         mtx = sparse.csr_matrix(submotif_matrix)
         motif_comp_mtx = mtx.copy()
@@ -333,3 +334,23 @@ class MotifLearner(_MotifVisualisation):
         self.pruned_motif_list = [self.motif_list[i] for i in prune_idx]
         return self.pruned_motif_list
 
+    def motif_composition_analysis(self):
+        """ Method to analyse the motifs and how they are related to one another in terms of 
+        sub-motifs and super-motifs. It also prunes the set of motifs and returns the set of motifs 
+        that are not sub-motifs of any other motif
+        
+        Parameters
+        ----------
+        self
+
+        Returns
+        -------
+        motif_comp_mtx : Compositional structure matrix of motifs (free of transitivtiy relations)
+        pruned_motif_list : {list} of motifs that are not sub-motifs of any other motif
+
+        """
+        assert (self.motif_list!=None), "motif_list is None\nAre you sure you ran the fit method on a dataset?"
+        self.motif_composition()
+        self.prune_motifs()
+
+        return self.motif_comp_mtx, self.pruned_motif_list
