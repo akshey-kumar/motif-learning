@@ -9,7 +9,7 @@ from scipy import sparse
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 
-class _MotifVisualitsation:
+class _MotifVisualisation:
 
     """
     Base class for plotting functions
@@ -80,7 +80,7 @@ class _MotifVisualitsation:
 
 
 
-class MotifLearner(_MotifVisualitsation):
+class MotifLearner(_MotifVisualisation):
     """
     A class to learn motifs in time-series data
 
@@ -125,6 +125,7 @@ class MotifLearner(_MotifVisualitsation):
         self.motif_list = None
         self.motif_comp = None
         self.pruned_motif_list = None
+        self.motif_comp_mtx = None
 
     def sim(self, u, v):
         """ Computes the Matching similarity function between two given vectors
@@ -274,26 +275,6 @@ class MotifLearner(_MotifVisualitsation):
                 return True
         return False
 
-    def motif_composition(self):
-        """ Finds whether certain bigger motifs are composed of smaller motifs
-        Parameters
-        ----------
-        self
-        Returns
-        -------
-        motif_comp: {dict} with keys represnting motifs indices as in self.motif_list.
-                    The value of each key contains a {list} of motif indices that are submotifs of
-                    the key motif
-        """
-        self.motif_comp = {}
-        for i, big_motif in reversed(list(enumerate(self.motif_list))):
-            self.motif_comp[i]=[]
-            for j in range(i):
-                small_motif = self.motif_list[j]
-                if self._is_submotif(big_motif, small_motif):
-                    self.motif_comp[i].append(j)
-        return self.motif_comp
-
     def fit(self, dataset):
         """ Fit method
         Parameters
@@ -337,8 +318,8 @@ class MotifLearner(_MotifVisualitsation):
         
         if as_array:
             return self.motif_comp_mtx.toarray()
-        else:
-            return self.motif_comp_mtx
+
+        return self.motif_comp_mtx
 
     def prune_motifs(self):
         """ Creates a pruned list of motifs by removing motifs that occur as submotifs.
@@ -348,7 +329,7 @@ class MotifLearner(_MotifVisualitsation):
         -------
         pruned_motif_list: {list} if frequent motifs that are not sub motifs of other motifs
         """
-        prune_idx = list(set(np.arange(len(self.motif_list)))- set(self.motif_comp_mtx.nonzero()[1]))
+        prune_idx = list(set(np.arange(len(self.motif_list))) - set(self.motif_comp_mtx.nonzero()[1]))
         self.pruned_motif_list = [self.motif_list[i] for i in prune_idx]
         return self.pruned_motif_list
 
