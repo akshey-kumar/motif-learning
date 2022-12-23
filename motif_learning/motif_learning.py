@@ -18,11 +18,8 @@ class _MotifVisualitsation:
         sim_thresh
         sim_matrix
         l_motif_range
-        iterator
         dataset
-        frequent
         motif_list
-        motif_comp
         pruned_motif_list
 
     Methods
@@ -311,10 +308,39 @@ class MotifLearner(_MotifVisualitsation):
         self.m = len(self.dataset)
         self.frequent = self.frequent_motifs()
         self.motif_list = self.get_motifs()
-        self.motif_comp = self.motif_composition()
         return self
 
-    def pruned_motifs(self):
+    def motif_composition(self, as_array=True):
+        """ Creates a matrix that tells whether the j-th motif is a submotif of i-th motif
+        This tells about the compositional structure of the motifs
+
+        After creating a matrix of submotif relations, it creates a transitivity-free matrix 
+        for the Hasse diagram. This is obtained by removing edges that are there for 
+        transitivity. That is, wherever there are three nodes x, y,and z with edges from x
+        to y and from y to z, remove the edge between x and z. This makes the compositional 
+        structure more readable
+        """
+        submotif_matrix = np.zeros((len(self.motif_list),len(self.motif_list)))
+        for i, big_motif in reversed(list(enumerate(self.motif_list))):
+            for j in range(i):
+                small_motif = self.motif_list[j]
+                if self._is_submotif(big_motif,small_motif):
+                    submotif_matrix[i,j]=1
+        ### Hasse pruning of submotif_matrix
+        mtx = sparse.csr_matrix(submotif_matrix)
+        motif_comp_mtx = mtx.copy()
+        for i,j in zip(*mtx.nonzero()):
+            for k,l in zip(*mtx.nonzero()):
+                if j==k:
+                    motif_comp_mtx[i,l]=0
+        self.motif_comp_mtx = motif_comp_mtx.toarray()
+        
+        if as_array:
+            return self.motif_comp_mtx.toarray()
+        else:
+            return self.motif_comp_mtx
+
+    def prune_motifs(self):
         """ Creates a pruned list of motifs by removing motifs that occur as submotifs.
         Parameters
         ----------
@@ -322,44 +348,7 @@ class MotifLearner(_MotifVisualitsation):
         -------
         pruned_motif_list: {list} if frequent motifs that are not sub motifs of other motifs
         """
-        sub_motifs = set()
-        for i in self.motif_comp:
-            sub_motifs = sub_motifs.union(set(self.motif_comp[i]))
-        self.pruned_motif_list = [i for j, i in enumerate(self.motif_list) if j not in list(sub_motifs)]
+        prune_idx = list(set(np.arange(len(self.motif_list)))- set(self.motif_comp_mtx.nonzero()[1]))
+        self.pruned_motif_list = [self.motif_list[i] for i in prune_idx]
         return self.pruned_motif_list
 
-
-
-def motif_composition(self):
-    """ Creates a matrix that tells whether the j-th motif is a submotif of i-th motif
-    This tells about the compositional structure of the motifs
-    """
-    motif_comp_mtx = np.zeros((len(self.motif_list),len(self.motif_list)))
-    for i, big_motif in reversed(list(enumerate(self.motif_list))):
-        for j in range(i):
-            small_motif = self.motif_list[j]
-            if self._is_submotif(big_motif,small_motif):
-                motif_comp_mtx[i,j]=1
-    self.motif_comp_mtx = motif_comp_mtx
-    return self.motif_comp_mtx
-
-# Matrix for Hasse diagram 
-### Obtained by removing edges that are there for transitivity
-### That is, wherever there are three nodes x, y,and z with
-### edges from x to y and from y to z, remove the edge between
-### x and z.
-
-mfc = self.motif_composition(ml)
-mtx = sparse.csr_matrix(mfc)
-new_mtx = mtx.copy()
-for i,j in zip(*mtx.nonzero()):
-    for k,l in zip(*mtx.nonzero()):
-        if j==k:
-            new_mtx[i,l]=0
-            
-print(mtx.toarray())
-print(new_mtx.toarray())
-### Pruned motifs
-prune_idx = list(set(np.arange(len(motifl.motif_list)))- set(new_mtx.nonzero()[1]))
-pruned_motif_list = [motifl.motif_list[i] for i in prune_idx]
-print(pruned_motif_list)
