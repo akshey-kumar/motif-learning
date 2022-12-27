@@ -76,7 +76,7 @@ class _MotifVisualisation:
                     )
                     plt.hlines(y=0, xmin=0, xmax=self.m)
 
-        if pruned:
+        if pruned: 
             self.pruned_motif_list = self.pruned_motifs()
             for motif in self.pruned_motif_list:
                 plot_single_motif(motif)
@@ -279,7 +279,6 @@ class MotifLearner(_MotifVisualisation):
         self.m = len(self.dataset)
         self.frequent = self.frequent_motifs()
         self.motif_list = self.get_motifs()
-        return self
 
     def _is_submotif(self, big_motif, small_motif):
         """Checks whether a smaller motif is a submotif of a bigger motif
