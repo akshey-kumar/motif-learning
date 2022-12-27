@@ -94,7 +94,6 @@ class MotifLearner(_MotifVisualisation):
         dataset
         frequent
         motif_list
-        motif_comp
         pruned_motif_list
 
     Methods
@@ -123,7 +122,6 @@ class MotifLearner(_MotifVisualisation):
         self.dataset = None
         self.frequent = None
         self.motif_list = None
-        self.motif_comp = None
         self.pruned_motif_list = None
         self.motif_comp_mtx = None
 
