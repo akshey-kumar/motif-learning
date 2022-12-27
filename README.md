@@ -1,20 +1,17 @@
 # motif-learning
 
-An sklearn-like module for the unsupervised learning of motifs in time-series data
+An sklearn-like module for the unsupervised learning of motifs in time-series data.
 
-#### Purpose of the Packag
+#### Purpose of the Package
 + The purpose of the package is facilitate motif learning in time-series datasets, and provide a toolkit to study their compositional properties and visualise them. 
 
 ### Features
 + The Motif Learner class 
 	- Fit on time-series
-	- Motif visulaisation
+	- Motif visualisation
 	- Motif compositional analysis
 	- Hasse diagram of motifs
-	- Motif pruninf
-
-
-
+	- Motif pruning
 
 ### Getting Started
 The package can be found on pypi hence you can install it using pip
@@ -23,7 +20,6 @@ The package can be found on pypi hence you can install it using pip
 ```bash
 pip install motif_learning
 ```
-
 
 ### Usage
 
@@ -43,7 +39,9 @@ pip install motif_learning
 ```
 
 ### Contribution
+Contributions are very welcome. 
 
+Let us know if you notice a bug!
 
 ### Author
-Akshey Kumar
++ Main maintainer: Akshey Kumar
