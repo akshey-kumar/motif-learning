@@ -318,7 +318,7 @@ class MotifLearner(_MotifVisualisation):
         self.motif_comp_mtx = motif_comp_mtx.toarray()
         
         if as_array:
-            return self.motif_comp_mtx.toarray()
+            return self.motif_comp_mtx
 
         return self.motif_comp_mtx
 
@@ -326,6 +326,7 @@ class MotifLearner(_MotifVisualisation):
         """ Creates a pruned list of motifs by removing motifs that occur as submotifs.
         Parameters
         ----------
+
         Returns
         -------
         pruned_motif_list: {list} if frequent motifs that are not sub motifs of other motifs
