@@ -14,7 +14,7 @@ An sklearn-like module for the unsupervised learning of motifs in time-series da
 	- Motif pruning
 
 ### Getting Started
-The package can be found on pypi hence you can install it using pip
+The package can (soon) be found on pypi hence you can install it using pip
 
 #### Installation
 ```bash
