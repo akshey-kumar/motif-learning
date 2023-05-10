@@ -8,6 +8,7 @@ import numpy as np
 from scipy import sparse
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
+import networkx as nx
 
 
 class _MotifVisualisation:
@@ -52,7 +53,7 @@ class _MotifVisualisation:
         interactive_plot = interactive(mplot, l_motif=tuple(self.l_motif_range))
         return interactive_plot
 
-    def plot_motif_appearances(self, pruned=True):
+    def plot_motif_appearances(self, pruned=False):
         """Plots the appearnces of the frequent motifs in the dataset
         Parameters
         ----------
@@ -77,7 +78,6 @@ class _MotifVisualisation:
                     plt.hlines(y=0, xmin=0, xmax=self.m)
 
         if pruned: 
-            self.pruned_motif_list = self.pruned_motifs()
             for motif in self.pruned_motif_list:
                 plot_single_motif(motif)
         else:
@@ -111,7 +111,6 @@ class MotifLearner(_MotifVisualisation):
         _is_submotif
         motif_composition
         fit
-        pruned_motifs
         matrix_plot
         plot_motif_appearances
     """
@@ -341,6 +340,37 @@ class MotifLearner(_MotifVisualisation):
         )
         self.pruned_motif_list = [self.motif_list[i] for i in prune_idx]
         return self.pruned_motif_list
+
+    def plot_motif_composition_graph(self):
+        """
+        Plots the transitivity free Hasse diagram that portrays how motifs compose one another.
+        """
+
+        motif_lengths = [len(motif) for motif in self.motif_list]
+        nodes = np.arange(len(self.motif_list))
+        G = nx.Graph()
+        G.add_nodes_from(nodes)
+
+        n = self.motif_comp_mtx.shape[0]
+        for i in range(n):
+            for j in range(i + 1, n):
+                if self.motif_comp_mtx.T[i, j] == 1:
+                    G.add_edge(nodes[i], nodes[j])
+        
+        pos = nx.spring_layout(G)
+        for node in nodes:
+            pos[node][1] = 2 * motif_lengths[node]
+
+        plt.figure(figsize=(15, 15))
+        nx.draw(
+            G,
+            pos,
+            with_labels=True,
+            node_color='lightblue',
+            node_size=1000,
+            font_size=12,
+        )
+        plt.show()
 
     def motif_composition_analysis(self):
         """Method to analyse the motifs and how they are related to one another in terms of
