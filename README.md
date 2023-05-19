@@ -37,6 +37,7 @@ pip install motif_learning
 [[1, 2, 3, 0]]
 
 ```
+For more detailed examples and visualisations, see `examples/`
 
 ### Contribution
 Contributions are very welcome. 
